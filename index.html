@@ -209,6 +209,16 @@
     .turn-name { margin: 6px 0 4px; font-size: clamp(40px, 9vw, 72px); font-weight: 900; letter-spacing: -.03em; }
     .turn-card p { margin: 0 0 28px; color: var(--text-2); }
     .loading { flex-direction: column; gap: 16px; color: var(--text-2); }
+    /* 로딩: 강아지가 발자국을 남기며 걸어가는 바 */
+    .walk-bar { position: relative; width: min(340px, 80vw); height: 70px; border-bottom: 3px dashed var(--line); }
+    .walk-paws { position: absolute; inset: 0; transition: opacity .4s; }
+    .walk-paws.fade { opacity: 0; }
+    .walk-paws span { position: absolute; width: 13px; transform: translate(-50%, 50%); }
+    .walk-paws span svg { display: block; width: 100%; animation: pawIn .3s ease-out; }
+    .walk-dog { position: absolute; left: 0; bottom: 8px; transform: translateX(-50%); }
+    .walk-dog .dog-svg { width: 64px; }
+    .walk-dog.running .leg-a, .walk-dog.running .leg-b, .walk-dog.running .dog-all { animation-duration: .36s; }
+    .walk-text { font-size: 20px; font-weight: 700; color: var(--text); }
     .spinner {
       width: 44px; height: 44px; border-radius: 50%;
       border: 4px solid rgba(121,81,61,.15); border-top-color: var(--caramel);
@@ -336,6 +346,7 @@
     .mode-seg button.dog-font { font-size: 20px; font-weight: 700; }     /* Dog/Emphasis/Bold */
     #add-player.dog-font { font-size: 20px; font-weight: 400; }          /* Dog/Emphasis/Regular */
     #start-btn.dog-font { font-size: 32px; font-weight: 700; padding-top: 10px; padding-bottom: 10px; }  /* Dog/Title/Bold */
+    #turn-start.dog-font { font-size: 32px; font-weight: 700; padding: 10px 40px; }  /* Dog/Title/Bold */
     #confirm-btn.dog-font, #next-btn.dog-font, #replay-btn.dog-font { font-size: 20px; font-weight: 700; }  /* Dog/Emphasis/Bold */
     .dog-pick-name.dog-font { font-size: 12px; font-weight: 400; }       /* Dog/Caption/Regular */
     [data-bark="hover"] { cursor: help; }
@@ -525,13 +536,16 @@
         <div class="turn-dog running" id="turn-dog"></div>
         <div class="turn-name" id="turn-name"></div>
         <p>다른 사람이 찍는 동안엔 화면을 보지 않기! 🙈</p>
-        <button class="start-btn" id="turn-start" type="button">준비 완료</button>
+        <button class="start-btn dog-font" id="turn-start" type="button">시작하개 🐾</button>
       </div>
     </div>
 
     <div class="loading hide" id="loading">
-      <div class="spinner"></div>
-      <div>새로운 장소로 이동하는 중…</div>
+      <div class="walk-bar" aria-hidden="true">
+        <div class="walk-paws" id="walk-paws"></div>
+        <div class="walk-dog running" id="walk-dog"></div>
+      </div>
+      <div class="dog-font walk-text">킁킁… 새로운 장소로 이동하는 중이개</div>
     </div>
   </section>
 
@@ -1837,13 +1851,13 @@
       showScreen('game');
       google.maps.event.trigger(pano, 'resize');
       el.turnOverlay.classList.add('hide');
-      el.loading.classList.remove('hide');
+      showLoading();
       updateHud();
       try {
         state.location = await findLocation(state.region);
       } catch (e) {
         console.error(e);
-        el.loading.classList.add('hide');
+        hideLoading();
         showScreen('setup');
         setupError(e.message === 'NO_PANO'
             ? '이 지역에서 거리뷰를 찾지 못했어요. 다시 시작해 주세요.'
@@ -1853,8 +1867,58 @@
       state.used.push(state.location.latLng);
       if (state.location.country) state.usedCountries.push(state.location.country);
       state.startPov = { heading: Math.random() * 360, pitch: 0 };
-      el.loading.classList.add('hide');
+      hideLoading();
       beginTurn();
+    }
+
+    // ── 로딩 바: 첫 번째 플레이어의 강아지가 발자국을 찍으며 왼쪽→오른쪽으로 걸어가요 ──
+    const WALK_LAP_MS = 2800;   // 한 번 건너가는 시간
+    const WALK_STEP_PX = 20;    // 발자국 간격
+    let walkRaf = 0;
+    function showLoading() {
+      el.loading.classList.remove('hide');
+      const p = (state && state.players[0]) || { dog: 'shiba', color: '#79513D' };
+      const dog = DOG_BY_ID[p.dog] || DOGS[0];
+      const dogEl = $('#walk-dog');
+      const paws = $('#walk-paws');
+      dogEl.innerHTML = dogSvg(dog.id, p.color);
+      const bar = paws.parentElement;
+      let lapStart = performance.now();
+      let nextPaw = WALK_STEP_PX;
+      let side = 1;
+      paws.innerHTML = '';
+      paws.classList.remove('fade');
+      cancelAnimationFrame(walkRaf);
+      const frame = (now) => {
+        const w = bar.clientWidth;
+        const f = (now - lapStart) / WALK_LAP_MS;
+        if (f >= 1) {
+          // 끝까지 가면 발자국을 지우고 처음부터 다시
+          paws.classList.add('fade');
+          setTimeout(() => { paws.innerHTML = ''; paws.classList.remove('fade'); }, 400);
+          lapStart = now; nextPaw = WALK_STEP_PX; side = 1;
+        } else {
+          const x = f * w;
+          dogEl.style.left = x + 'px';
+          // 강아지 엉덩이 뒤쪽에 발자국 남기기 (왼발·오른발 번갈아)
+          const behind = x - 18;
+          while (nextPaw <= behind) {
+            const s = document.createElement('span');
+            s.style.left = nextPaw + 'px';
+            s.style.bottom = (side > 0 ? 3 : 13) + 'px';
+            s.innerHTML = pawSvg(dog, p.color);
+            paws.appendChild(s);
+            side = -side;
+            nextPaw += WALK_STEP_PX;
+          }
+        }
+        walkRaf = requestAnimationFrame(frame);
+      };
+      walkRaf = requestAnimationFrame(frame);
+    }
+    function hideLoading() {
+      cancelAnimationFrame(walkRaf);
+      el.loading.classList.add('hide');
     }
 
     function resetView() {
