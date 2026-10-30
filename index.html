@@ -1425,7 +1425,7 @@
       const country = setup.mode === 'country';
       el.regionField.classList.toggle('hide', country);
       el.brandSub.innerHTML = country
-          ? '세계 어딘가의 거리 풍경을 보고 어느 나라인지 지도에서 골라 보세요.<br>정답 5점 · 옆나라 3점 · 같은 대륙 2점'
+          ? '<span class="nowrap">세계 어딘가의 거리 풍경을 보고</span><br><span class="nowrap">어느 나라인지 지도에서 골라 보세요.</span><br><span class="nowrap">정답 5점 · 옆나라 3점 · 같은 대륙 2점</span>'
           : '거리 풍경만 보고 어디인지 지도에 찍어 보세요.<br>내 강아지가 정답 지점까지 달려가요.<br><span class="nowrap">먼저 도착하면 승리!&nbsp;🐾</span>';
     }
     syncMode();
