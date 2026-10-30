@@ -124,6 +124,11 @@
     .rank-answer.no { color: var(--text-2); }
     .rank-sub { display: block; font-size: 11px; font-weight: 500; color: var(--text-3); }
     .title-sub { display: block; margin-top: 4px; font-size: 16px; font-weight: 700; color: var(--caramel); }
+    .comeback {
+      display: block; margin-top: 10px; padding: 10px 14px; border-radius: 14px;
+      background: rgba(246, 215, 122, .35); color: var(--chocolate);
+      font-size: 17px; font-weight: 700; line-height: 1.35; letter-spacing: 0;
+    }
 
     .settings { width: min(420px, calc(100vw - 32px)); padding: 0; border: none; border-radius: 20px;
       background: var(--ivory); color: var(--text); box-shadow: var(--shadow); }
@@ -2142,6 +2147,26 @@
       return ['🥇', '🥈', '🥉'][place - 1] || `${place}등`;
     }
 
+    // 더 멀리서 출발한 강아지가 이겼을 때: 왜 역전했는지 설명
+    function stopCount(r) {
+      return r.plan ? r.plan.segs.filter((sg) => sg.type === 'stop').length : 0;
+    }
+    function iGa(word) {   // 받침 있으면 '이', 없으면 '가'
+      const ch = word.charCodeAt(word.length - 1);
+      return word + (ch >= 0xac00 && ch <= 0xd7a3 && (ch - 0xac00) % 28 ? '이' : '가');
+    }
+    function comebackStory(win, near) {
+      const wDog = (DOG_BY_ID[win.p.dog] || DOGS[0]).name;
+      const nDog = (DOG_BY_ID[near.p.dog] || DOGS[0]).name;
+      const gap = fmtDist(Math.max(0, win.dist - near.dist));
+      const ws = stopCount(win), ns = stopCount(near);
+      let why;
+      if (ns > ws) why = `${near.p.name}의 ${iGa(nDog)} ${ns === 1 ? '한 번' : ns + '번이나'} 멈춰서 킁킁거리는 사이, 한눈팔지 않고 달렸개!`;
+      else if (win.speed > near.speed * 1.03) why = '오늘 컨디션 최고! 네 발에 불이 나게 달렸개!';
+      else why = '숨이 차도 끝까지 포기하지 않고 달렸개!';
+      return `🐾 ${gap}나 더 멀었지만 ${win.p.name}의 ${iGa(wDog)} 노력으로 이겼개! ${why}`;
+    }
+
     function showBubble(container, text) {
       if (!container) return;
       const b = document.createElement('span');
@@ -2615,11 +2640,15 @@
           const firsts = runners.filter((r) => r.place === 1);
           const nearest = runners.reduce((a, b) => (b.dist < a.dist ? b : a));
           let sub = `정답까지 ${fmtDist(firsts[0].dist)}`;
+          let story = '';
           if (!firsts.includes(nearest)) {
-            sub += ` · 🔥 더 가까웠던 ${nearest.p.name}(${fmtDist(nearest.dist)})를 역전!`;
+            sub += ` · 🔥 ${nearest.p.name}(${fmtDist(nearest.dist)}) 역전!`;
+            story = comebackStory(firsts[0], nearest);
+            race.comeback = { win: firsts[0], near: nearest };
           }
           el.resultTitle.innerHTML =
-              `🏆 ${esc(firsts.map((r) => r.p.name).join(' · '))} 1등 도착!<span class="title-sub">${esc(sub)}</span>`;
+              `🏆 ${esc(firsts.map((r) => r.p.name).join(' · '))} 1등 도착!<span class="title-sub">${esc(sub)}</span>` +
+              (story ? `<span class="comeback dog-font">${esc(story)}</span>` : '');
         } else {
           const r = runners[0];
           el.resultTitle.innerHTML = `정답까지 ${fmtDist(r.dist)}<span class="title-sub">${esc(closenessLabel(r.dist))}</span>`;
@@ -2653,7 +2682,11 @@
             ${multi && done ? `<span class="rank-wins">누적 ${r.p.wins}점</span>` : ''}
           </li>`;
       }
-      const sub = !r.guess ? '🙈 길을 잃었어요' : (done ? esc(closenessLabel(r.dist)) : '도착! 🐾');
+      let sub = !r.guess ? '🙈 길을 잃었어요' : (done ? esc(closenessLabel(r.dist)) : '도착! 🐾');
+      if (done && r.guess && race && race.comeback) {
+        if (r === race.comeback.win) sub = '🔥 노력으로 역전!';
+        else if (r === race.comeback.near) sub = stopCount(r) ? '킁킁하다 역전당했개' : '아깝개! 한 끗 차이';
+      }
       return `
         <li class="rank-item${r.win && done ? ' win' : ''}">
           <span class="rank-place">${r.place ? medal(r.place) : '–'}</span>
