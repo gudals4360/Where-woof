@@ -330,13 +330,20 @@
     /* 강아지 글꼴 (Figma의 Dog/… 스타일) — 누르거나 3초 갖다 대면 짖어요 */
     .dog-font { font-family: 'Gaegu', Pretendard, sans-serif !important; font-weight: 700; letter-spacing: 0; }
     [data-bark] { position: relative; }
+    /* Figma Dog/… 텍스트 스타일과 같은 크기·굵기 */
+    .brand h1.dog-font { font-size: 48px; font-weight: 700; }            /* Dog/Title2/Bold */
+    .mode-seg button.dog-font { font-size: 20px; font-weight: 700; }     /* Dog/Emphasis/Bold */
+    #add-player.dog-font { font-size: 20px; font-weight: 400; }          /* Dog/Emphasis/Regular */
+    #start-btn.dog-font { font-size: 32px; font-weight: 700; padding-top: 10px; padding-bottom: 10px; }  /* Dog/Title/Bold */
+    #confirm-btn.dog-font, #next-btn.dog-font, #replay-btn.dog-font { font-size: 20px; font-weight: 700; }  /* Dog/Emphasis/Bold */
+    .dog-pick-name.dog-font { font-size: 12px; font-weight: 400; }       /* Dog/Caption/Regular */
     [data-bark="hover"] { cursor: help; }
     .bark-wiggle { animation: wiggle .5s ease-in-out; }
     @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
     .bark-bubble {
       position: absolute; bottom: 100%; left: 50%; z-index: 5;
       padding: 4px 9px; border-radius: 12px; background: var(--ivory); color: var(--chocolate);
-      font: 700 15px/1.2 'Gaegu', Pretendard, sans-serif; white-space: nowrap;
+      font: 400 16px/1.2 'Gaegu', Pretendard, sans-serif;  /* Dog/Body/Regular */ white-space: nowrap;
       box-shadow: 0 2px 6px rgba(0,0,0,.3); pointer-events: none;
       animation: bubble .95s ease-out forwards;
     }
@@ -508,7 +515,7 @@
 
     <div class="guess-card" id="guess-card">
       <div class="guess-map" id="guess-map"></div>
-      <button class="start-btn small confirm-btn dog-font" id="confirm-btn" type="button" data-bark="click" disabled>지도를 눌러 위치를 찍어 주세요</button>
+      <button class="start-btn small confirm-btn dog-font" id="confirm-btn" type="button" data-bark="click" disabled>킁킁… 지도에 콕 찍어주개!</button>
     </div>
 
     <div class="turn-overlay hide" id="turn-overlay">
@@ -1907,7 +1914,7 @@
       }
       el.guessCard.classList.remove('has-guess');
       el.confirmBtn.disabled = true;
-      el.confirmBtn.textContent = '지도를 눌러 위치를 찍어 주세요';
+      el.confirmBtn.textContent = '킁킁… 지도에 콕 찍어주개!';
     }
 
     // 지도 위 강아지 마커 (이름표 + 등수 배지 + 말풍선 자리)
@@ -2258,7 +2265,7 @@
           ? `정답은 ${esc(answerCountry.name)}!<span class="title-sub">🐾 강아지들이 달려가요!</span>`
           : '🐾 강아지들 출발!<span class="title-sub">누가 먼저 뼈다귀에 도착할까요?</span>';
       el.rankList.innerHTML = '';
-      el.nextBtn.textContent = '결과 바로 보기';
+      el.nextBtn.textContent = '기다리기 힘들개! 바로 보기';
 
       drawResult(answer, results, answerCountry);
     }
@@ -2525,7 +2532,7 @@
       }
 
       race = null;
-      el.nextBtn.textContent = state.round >= state.rounds ? '최종 결과 보기' : '산책갈까?';
+      el.nextBtn.textContent = state.round >= state.rounds ? '누가 1등이개? 🏆' : '산책갈까?';
       el.nextBtn.focus();
     }
 
