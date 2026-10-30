@@ -440,7 +440,7 @@
       <div class="field">
         <div class="field-label">게임 모드</div>
         <div class="seg mode-seg" data-name="mode" role="group" aria-label="게임 모드">
-          <button type="button" class="dog-font" data-bark="click" data-value="spot">📍 위치 맞히기</button>
+          <button type="button" class="dog-font" data-bark="click" data-value="spot">📍 어디개?</button>
           <button type="button" class="dog-font" data-bark="click" data-value="country">🌏 어디 나라개?</button>
         </div>
       </div>
@@ -448,7 +448,7 @@
       <div class="field">
         <div class="field-label">플레이어</div>
         <ul class="players" id="players"></ul>
-        <button class="ghost-btn dog-font" id="add-player" type="button">+ 플레이어 추가</button>
+        <button class="ghost-btn dog-font" id="add-player" type="button">+ 같이 산책할 인간이 있개?</button>
       </div>
 
       <div class="field" id="region-field">
@@ -482,7 +482,7 @@
 
 
       <div class="setup-error" id="setup-error" role="alert"></div>
-      <button class="start-btn dog-font" id="start-btn" type="button" data-bark="click">게임 시작</button>
+      <button class="start-btn dog-font" id="start-btn" type="button" data-bark="click">산책갈까?</button>
     </div>
   </section>
 
@@ -534,7 +534,7 @@
       <div class="sheet-kicker" id="result-kicker"></div>
       <h2 id="result-title"></h2>
       <ol class="rank-list" id="rank-list"></ol>
-      <button class="start-btn small dog-font" id="next-btn" type="button" data-bark="click">다음 라운드</button>
+      <button class="start-btn small dog-font" id="next-btn" type="button" data-bark="click">산책갈까?</button>
     </div>
   </section>
 
@@ -548,7 +548,7 @@
       <ol class="final-list" id="final-list"></ol>
       <div class="final-actions">
         <button class="ghost-btn" id="to-setup" type="button">설정 바꾸기</button>
-        <button class="start-btn small dog-font" id="replay-btn" type="button" data-bark="click">한 판 더</button>
+        <button class="start-btn small dog-font" id="replay-btn" type="button" data-bark="click">한 번 더 산책하기</button>
       </div>
     </div>
   </section>
@@ -1924,7 +1924,7 @@
     function placeGuess(latLng) {
       if (!el.turnOverlay.classList.contains('hide')) return;
       const p = state.players[state.turn];
-      let label = '여기로 결정!';
+      let label = '산책갈까?';
       if (state.mode === 'country') {
         const c = countryAt(latLng);
         if (!c) {
@@ -1935,7 +1935,7 @@
         state.guess = { latLng, code: c.code };
         if (guessShape) guessShape.setMap(null);
         guessShape = countryShape(guessMap, c, p.color, 0.3);
-        label = `${withEuro(c.name)} 결정!`;
+        label = `${withEuro(c.name)} 산책갈까?`;
       } else {
         state.guess = latLng;
       }
@@ -2525,7 +2525,7 @@
       }
 
       race = null;
-      el.nextBtn.textContent = state.round >= state.rounds ? '최종 결과 보기' : '다음 라운드';
+      el.nextBtn.textContent = state.round >= state.rounds ? '최종 결과 보기' : '산책갈까?';
       el.nextBtn.focus();
     }
 
