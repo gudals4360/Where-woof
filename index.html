@@ -343,7 +343,7 @@
     [data-bark] { position: relative; }
     /* Figma Dog/… 텍스트 스타일과 같은 크기·굵기 */
     .brand h1.dog-font { font-size: 48px; font-weight: 700; }            /* Dog/Title2/Bold */
-    .mode-seg button.dog-font { font-size: 20px; font-weight: 700; }     /* Dog/Emphasis/Bold */
+    .mode-seg button.dog-font { font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }     /* Dog/Emphasis/Bold */
     #add-player.dog-font { font-size: 20px; font-weight: 400; }          /* Dog/Emphasis/Regular */
     #start-btn.dog-font { font-size: 32px; font-weight: 700; padding-top: 10px; padding-bottom: 10px; }  /* Dog/Title/Bold */
     #turn-start.dog-font { font-size: 32px; font-weight: 700; padding: 10px 40px; }  /* Dog/Title/Bold */
@@ -459,8 +459,8 @@
       <div class="field">
         <div class="field-label">게임 모드</div>
         <div class="seg mode-seg" data-name="mode" role="group" aria-label="게임 모드">
-          <button type="button" class="dog-font" data-bark="click" data-value="spot">📍 어디개?</button>
-          <button type="button" class="dog-font" data-bark="click" data-value="country">🌏 어디 나라개?</button>
+          <button type="button" class="dog-font" data-bark="click" data-value="spot"><span aria-hidden="true">📍</span>어디개?<span aria-hidden="true">📍</span></button>
+          <button type="button" class="dog-font" data-bark="click" data-value="country"><span aria-hidden="true">🌏</span>어디 나라개?<span aria-hidden="true">🌏</span></button>
         </div>
       </div>
 
