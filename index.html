@@ -14,6 +14,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>어디개? Where Woof</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <!-- 강아지 글꼴: Gaegu (SIL Open Font License) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap">
   <style>
     :root {
       --bg: #0e1628;
@@ -78,7 +82,7 @@
       background: var(--panel-solid); border: 1px solid var(--line); box-shadow: var(--shadow);
     }
     .brand { display: flex; gap: 14px; align-items: center; margin-bottom: 24px; }
-    .brand h1 { margin: 0; font-size: 34px; font-weight: 900; letter-spacing: -.03em; }
+    .brand h1 { margin: 0; font-size: 40px; font-weight: 900; letter-spacing: -.03em; }
     .brand p { margin: 4px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.5; }
 
     .field { margin-bottom: 18px; }
@@ -243,6 +247,18 @@
     .final-name { font-weight: 800; }
     .final-meta { font-size: 12px; color: var(--text-2); margin-top: 2px; }
     .final-wins { font-size: 20px; font-weight: 900; }
+    .final-talk { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 4px 0 20px; }
+    .final-talk-dog { position: relative; width: 84px; flex: none; }
+    .final-talk-dog svg { display: block; width: 100%; }
+    .final-talk-text {
+      position: relative; margin-bottom: 26px; padding: 10px 16px; border-radius: 18px;
+      background: #fff; color: #111; font-size: 22px; line-height: 1.25; text-align: left;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25); animation: pop .35s ease-out;
+    }
+    .final-talk-text::after {
+      content: ''; position: absolute; left: -8px; bottom: 12px;
+      border: 8px solid transparent; border-right-color: #fff; border-left: 0;
+    }
     .final-actions { display: flex; gap: 10px; }
     .final-actions > * { flex: 1; }
 
@@ -297,10 +313,16 @@
       font: 900 14px/1.3 Pretendard, sans-serif; box-shadow: 0 2px 6px rgba(0,0,0,.3);
       animation: pop .3s ease-out;
     }
+    /* 강아지 글꼴 (Figma의 Dog/… 스타일) — 누르거나 3초 갖다 대면 짖어요 */
+    .dog-font { font-family: 'Gaegu', Pretendard, sans-serif !important; font-weight: 700; letter-spacing: 0; }
+    [data-bark] { position: relative; }
+    [data-bark="hover"] { cursor: help; }
+    .bark-wiggle { animation: wiggle .5s ease-in-out; }
+    @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
     .bark-bubble {
       position: absolute; bottom: 100%; left: 50%; z-index: 5;
       padding: 4px 9px; border-radius: 12px; background: #fff; color: #111;
-      font: 800 13px/1.2 Pretendard, sans-serif; white-space: nowrap;
+      font: 700 15px/1.2 'Gaegu', Pretendard, sans-serif; white-space: nowrap;
       box-shadow: 0 2px 6px rgba(0,0,0,.3); pointer-events: none;
       animation: bubble .95s ease-out forwards;
     }
@@ -393,7 +415,7 @@
       <header class="brand">
         <div class="brand-dog" id="brand-dog" aria-hidden="true"></div>
         <div>
-          <h1>어디개?</h1>
+          <h1 class="dog-font" data-bark="hover">어디개?</h1>
           <p id="brand-sub"></p>
         </div>
       </header>
@@ -401,15 +423,15 @@
       <div class="field">
         <div class="field-label">게임 모드</div>
         <div class="seg mode-seg" data-name="mode" role="group" aria-label="게임 모드">
-          <button type="button" data-value="spot">📍 위치 맞히기</button>
-          <button type="button" data-value="country">🌏 어디 나라개?</button>
+          <button type="button" class="dog-font" data-bark="click" data-value="spot">📍 위치 맞히기</button>
+          <button type="button" class="dog-font" data-bark="click" data-value="country">🌏 어디 나라개?</button>
         </div>
       </div>
 
       <div class="field">
         <div class="field-label">플레이어</div>
         <ul class="players" id="players"></ul>
-        <button class="ghost-btn" id="add-player" type="button">+ 플레이어 추가</button>
+        <button class="ghost-btn dog-font" id="add-player" type="button">+ 플레이어 추가</button>
       </div>
 
       <div class="field" id="region-field">
@@ -448,7 +470,7 @@
       </details>
 
       <div class="setup-error" id="setup-error" role="alert"></div>
-      <button class="start-btn" id="start-btn" type="button">게임 시작</button>
+      <button class="start-btn dog-font" id="start-btn" type="button" data-bark="click">게임 시작</button>
     </div>
   </section>
 
@@ -474,7 +496,7 @@
 
     <div class="guess-card" id="guess-card">
       <div class="guess-map" id="guess-map"></div>
-      <button class="start-btn small confirm-btn" id="confirm-btn" type="button" disabled>지도를 눌러 위치를 찍어 주세요</button>
+      <button class="start-btn small confirm-btn dog-font" id="confirm-btn" type="button" data-bark="click" disabled>지도를 눌러 위치를 찍어 주세요</button>
     </div>
 
     <div class="turn-overlay hide" id="turn-overlay">
@@ -500,7 +522,7 @@
       <div class="sheet-kicker" id="result-kicker"></div>
       <h2 id="result-title"></h2>
       <ol class="rank-list" id="rank-list"></ol>
-      <button class="start-btn small" id="next-btn" type="button">다음 라운드</button>
+      <button class="start-btn small dog-font" id="next-btn" type="button" data-bark="click">다음 라운드</button>
     </div>
   </section>
 
@@ -510,10 +532,11 @@
       <div class="trophy">🏆</div>
       <h1 id="final-title"></h1>
       <p class="final-sub" id="final-sub"></p>
+      <div class="final-talk" id="final-talk" data-bark="hover"></div>
       <ol class="final-list" id="final-list"></ol>
       <div class="final-actions">
         <button class="ghost-btn" id="to-setup" type="button">설정 바꾸기</button>
-        <button class="start-btn small" id="replay-btn" type="button">한 판 더</button>
+        <button class="start-btn small dog-font" id="replay-btn" type="button" data-bark="click">한 판 더</button>
       </div>
     </div>
   </section>
@@ -645,6 +668,37 @@
       b.textContent = d.voice.text;
       container.appendChild(b);
       setTimeout(() => b.remove(), 950);
+    }
+
+    /* ── 강아지 글꼴이 쓰인 곳: 누르면(버튼) 또는 3초 갖다 대면(글자) 짖기 ── */
+    const HOVER_BARK_MS = 3000;
+    let barkDogFor = () => 'shiba';   // 지금 상황에 맞는 강아지 (게임 중엔 차례인 플레이어의 강아지)
+    function barkAt(target, dogId) {
+      const id = dogId || target.dataset.dog || barkDogFor();
+      Sound.bark(id);
+      showBark(target, id);
+      target.classList.remove('bark-wiggle');
+      void target.offsetWidth;
+      target.classList.add('bark-wiggle');
+    }
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-bark="click"]');
+      if (t && !t.disabled) barkAt(t);
+    }, true);
+    function hoverBark(node) {
+      let timer = null;
+      const stop = () => { clearTimeout(timer); timer = null; };
+      const start = () => {
+        stop();
+        timer = setTimeout(function again() {
+          barkAt(node);
+          timer = setTimeout(again, HOVER_BARK_MS);   // 계속 대고 있으면 3초마다 또 짖어요
+        }, HOVER_BARK_MS);
+      };
+      node.addEventListener('pointerenter', start);
+      node.addEventListener('pointerleave', stop);
+      node.addEventListener('pointercancel', stop);
+      node.addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') stop(); });
     }
 
     /* ════════════════════════════════════════════
@@ -1145,6 +1199,7 @@
       rankList: $('#rank-list'),
       nextBtn: $('#next-btn'),
       finalTitle: $('#final-title'),
+      finalTalk: $('#final-talk'),
       finalSub: $('#final-sub'),
       finalList: $('#final-list'),
       toSetup: $('#to-setup'),
@@ -1232,7 +1287,7 @@
         <li class="player-row">
           <button class="dog-pick" type="button" title="강아지 고르기" aria-label="플레이어 ${i + 1} 강아지: ${dog.name}. 눌러서 바꾸기">
             ${dogSvg(dog.id, COLORS[i])}
-            <span class="dog-pick-name">${dog.name}</span>
+            <span class="dog-pick-name dog-font">${dog.name}</span>
           </button>
           <input type="text" maxlength="12" value="${esc(name)}" placeholder="플레이어 ${i + 1}" aria-label="플레이어 ${i + 1} 이름">
           ${setup.players.length > 1 ? `<button class="player-remove" type="button" aria-label="플레이어 ${i + 1} 빼기">×</button>` : ''}
@@ -1242,7 +1297,8 @@
         row.querySelector('input').addEventListener('input', (e) => { setup.players[i] = e.target.value; });
         row.querySelector('.dog-pick').addEventListener('click', (e) => {
           e.stopPropagation();
-          Sound.click();
+          Sound.bark(setup.dogs[i]);
+          showBark(row.querySelector('.dog-pick'), setup.dogs[i]);
           toggleDogMenu(row, i);
         });
         const rm = row.querySelector('.player-remove');
@@ -1334,6 +1390,8 @@
     }
 
     renderPlayers();
+    barkDogFor = () => (state && state.players[state.turn] ? state.players[state.turn].dog : setup.dogs[0]) || 'shiba';
+    document.querySelectorAll('[data-bark="hover"]').forEach(hoverBark);
     el.brandDog.innerHTML = dogSvg('shiba', '#dbff3c');
     el.brandDog.addEventListener('click', () => {
       Sound.bark('shiba');
@@ -2526,6 +2584,19 @@
           </li>`;
       }).join('');
 
+      // 우승 강아지의 마지막 한 마디 (다시 만나고 싶은 인사)
+      const BYE_LINES = [
+        '다음에 또 산책하개! 🐾',
+        '내일도 같이 놀러 가개?',
+        '꼬리 흔들며 기다리고 있개!',
+        '또 같이 달리개! 약속이개?',
+        '오늘 산책 최고였개! 또 오개!',
+        '킁킁… 벌써 보고 싶개!',
+      ];
+      el.finalTalk.dataset.dog = top.dog;
+      el.finalTalk.innerHTML = `
+        <span class="final-talk-dog">${dogSvg(top.dog, top.color)}</span>
+        <span class="final-talk-text dog-font">${BYE_LINES[Math.floor(Math.random() * BYE_LINES.length)]}</span>`;
       showScreen('final');
       Sound.fanfare(true);
       Sound.bark(top.dog, 0.9);
