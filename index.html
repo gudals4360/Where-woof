@@ -615,23 +615,23 @@
     const DOGS = [
       { id: 'shiba', paw: { type: 'claw', size: 13, color: '#b8692a' }, name: '시바', body: '#e39b55', belly: '#fff4e3', dark: '#c97a35', ear: 'pointy', tail: 'curl',
         voice: { text: '왈왈!', f: 520, n: 2, len: 0.13, gap: 0.2 } },
-      { id: 'jindo', paw: { type: 'claw', size: 14, color: '#a08654' }, speed: 1.02, name: '진돗개', body: '#f2e3c6', belly: '#fffaf0', dark: '#d9c091', ear: 'pointy', tail: 'curl',
+      { id: 'jindo', paw: { type: 'claw', size: 14, color: '#a08654' }, name: '진돗개', body: '#f2e3c6', belly: '#fffaf0', dark: '#d9c091', ear: 'pointy', tail: 'curl',
         voice: { text: '멍멍!', f: 360, n: 2, len: 0.16, gap: 0.24 } },
-      { id: 'maltese', paw: { type: 'fluffy', size: 10, color: '#b9ad98' }, speed: 0.97, name: '말티즈', body: '#f6f3ec', belly: '#ffffff', dark: '#ded6c6', ear: 'floppy', tail: 'fluffy', size: 0.82,
+      { id: 'maltese', paw: { type: 'fluffy', size: 10, color: '#b9ad98' }, name: '말티즈', body: '#f6f3ec', belly: '#ffffff', dark: '#ded6c6', ear: 'floppy', tail: 'fluffy', size: 0.82,
         voice: { text: '앙앙!', f: 950, n: 2, len: 0.09, gap: 0.15 } },
       { id: 'poodle', paw: { type: 'fluffy', size: 12, color: '#7b4d2f' }, name: '푸들', body: '#9a6440', belly: '#b98258', dark: '#7b4d2f', ear: 'floppy', tail: 'fluffy',
         voice: { text: '왕왕!', f: 720, n: 2, len: 0.11, gap: 0.17 } },
-      { id: 'husky', paw: { type: 'claw', size: 15, color: '#4f5866' }, speed: 1.03, name: '허스키', body: '#7d8796', belly: '#f1f3f6', dark: '#5f6875', ear: 'pointy', tail: 'up', mask: true,
+      { id: 'husky', paw: { type: 'claw', size: 15, color: '#4f5866' }, name: '허스키', body: '#7d8796', belly: '#f1f3f6', dark: '#5f6875', ear: 'pointy', tail: 'up', mask: true,
         voice: { text: '아우~', f: 430, type: 'howl', len: 0.9 } },
-      { id: 'retriever', paw: { type: 'round', size: 16, color: '#b07d33' }, speed: 1.02, name: '리트리버', body: '#e2b15f', belly: '#f3d39a', dark: '#c38c3c', ear: 'floppy', tail: 'up', size: 1.1,
+      { id: 'retriever', paw: { type: 'round', size: 16, color: '#b07d33' }, name: '리트리버', body: '#e2b15f', belly: '#f3d39a', dark: '#c38c3c', ear: 'floppy', tail: 'up', size: 1.1,
         voice: { text: '월월!', f: 250, n: 2, len: 0.2, gap: 0.28 } },
-      { id: 'corgi', paw: { type: 'round', size: 12, color: '#b85f1e' }, speed: 0.97, name: '웰시코기', body: '#e58a3c', belly: '#fff6ea', dark: '#c46c25', ear: 'pointy', tail: 'stub', short: true,
+      { id: 'corgi', paw: { type: 'round', size: 12, color: '#b85f1e' }, name: '웰시코기', body: '#e58a3c', belly: '#fff6ea', dark: '#c46c25', ear: 'pointy', tail: 'stub', short: true,
         voice: { text: '왕!', f: 640, n: 1, len: 0.15 } },
-      { id: 'dachshund', paw: { type: 'oval', size: 11, color: '#6e3418' }, speed: 0.96, name: '닥스훈트', body: '#a3532c', belly: '#c87a4f', dark: '#7d3c1d', ear: 'floppy', tail: 'up', long: true, short: true,
+      { id: 'dachshund', paw: { type: 'oval', size: 11, color: '#6e3418' }, name: '닥스훈트', body: '#a3532c', belly: '#c87a4f', dark: '#7d3c1d', ear: 'floppy', tail: 'up', long: true, short: true,
         voice: { text: '왈!', f: 560, n: 1, len: 0.13 } },
       { id: 'beagle', paw: { type: 'round', size: 13, color: '#7a4f2c' }, name: '비글', body: '#f6efe2', belly: '#ffffff', dark: '#8a5a32', ear: 'floppy', tail: 'up', saddle: '#3b2a1e',
         voice: { text: '아우우!', f: 480, type: 'howl', len: 0.7 } },
-      { id: 'bulldog', paw: { type: 'wide', size: 15, color: '#6f685e' }, speed: 0.97, name: '불독', body: '#b9b2a8', belly: '#efe9df', dark: '#8d857a', ear: 'floppy', tail: 'stub', size: 1.05,
+      { id: 'bulldog', paw: { type: 'wide', size: 15, color: '#6f685e' }, name: '불독', body: '#b9b2a8', belly: '#efe9df', dark: '#8d857a', ear: 'floppy', tail: 'stub', size: 1.05,
         voice: { text: '웡!', f: 210, n: 1, len: 0.22 } },
     ];
     const DOG_BY_ID = Object.fromEntries(DOGS.map((d) => [d.id, d]));
@@ -2128,7 +2128,7 @@
       startMs: 1000,        // 출발 기본 시간
       msPerUnit: 700,       // 기준 거리 1칸 달리는 시간
       maxMs: 6000,          // 가장 먼 강아지도 대략 이 시간 안에 (넘으면 전체를 눌러 줌)
-      speedSwing: 0.12,     // 그날 컨디션: 속도 ±12%
+      speedSwing: 0.08,     // 그날 컨디션: 속도 0.92~1.08 (견종 차이 없음, 모두 기본 1)
     };
     const STOP_LINES = ['킁킁…', '두리번두리번', '나비다!', '어? 고양이?', '헥헥…', '잠깐 쉬자', '뭐지 이 냄새', '꼬리 잡기!'];
 
@@ -2207,9 +2207,8 @@
       const squeeze = maxBase > RACE.maxMs ? (RACE.maxMs - RACE.startMs) / (maxBase - RACE.startMs) : 1;
       runners.forEach((r) => {
         const base = RACE.startMs + (r.baseMs - RACE.startMs) * squeeze;
-        const breed = DOG_BY_ID[r.p.dog] || DOGS[0];
         const condition = 1 - RACE.speedSwing + Math.random() * RACE.speedSwing * 2;
-        r.speed = condition * (breed.speed || 1);
+        r.speed = condition;
         const runMs = base / r.speed;
 
         // 0~2번 멈추기 (35%는 안 멈춤)
