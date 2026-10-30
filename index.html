@@ -2234,8 +2234,8 @@
     }
 
     const TIER_LABEL = {
-      correct: '✅ 정답',
-      neighbor: '🟡 옆나라',
+      correct: '🎉 정답! 대단하개',
+      neighbor: '🟡 옆나라! 아깝개',
       continent: '🔵 같은 대륙',
       wrong: '❌ 다른 대륙',
       miss: '⏱ 시간 초과',
@@ -2262,10 +2262,11 @@
       const continent = answerCountry && COUNTRY_CONTINENT[answerCountry.code];
       el.resultKicker.textContent = `라운드 ${state.round} / ${state.rounds} 결과${continent ? ' · ' + continent : ''}`;
       el.resultTitle.innerHTML = answerCountry
-          ? `정답은 ${esc(answerCountry.name)}!<span class="title-sub">🐾 강아지들이 달려가요!</span>`
+          ? `정답은…<span class="title-sub">두구두구 🥁</span>`
           : '🐾 강아지들 출발!<span class="title-sub">누가 먼저 뼈다귀에 도착할까요?</span>';
       el.rankList.innerHTML = '';
-      el.nextBtn.textContent = '기다리기 힘들개! 바로 보기';
+      el.nextBtn.textContent = answerCountry ? '잠깐만 기다리개…' : '기다리기 힘들개! 바로 보기';
+      el.nextBtn.disabled = !!answerCountry;
 
       drawResult(answer, results, answerCountry);
     }
@@ -2308,6 +2309,14 @@
         r.runner = null;
         r.arrived = false;
         if (!r.guess) return;
+        if (answerCountry) {
+          // 나라 맞히기: 달리지 않고 각자 고른 곳에 강아지만 앉아 있어요
+          const dogEl = makeDogMarker(r.p, { tag: true });
+          const marker = new HtmlMarker({ map: resultMap, position: r.guess, content: dogEl, zIndex: 100, anchor: 'bottom' });
+          resultOverlays.push(marker);
+          r.runner = { marker, dogEl };
+          return;
+        }
         // 가야 할 길(점선)과 지나온 길(실선)
         resultOverlays.push(new G.Polyline({
           map: resultMap, path: [r.guess, answer], geodesic: true, clickable: false,
@@ -2353,7 +2362,16 @@
         }
         google.maps.event.addListenerOnce(resultMap, 'idle', () => {
           if (resultMap.getZoom() > 17) resultMap.setZoom(17);
-          setTimeout(() => startRace(answer, results, answerCountry, token), 500);
+          if (answerCountry) {
+            // 나라 맞히기는 경주 없이 바로 점수 발표
+            setTimeout(() => {
+              if (token !== raceToken) return;
+              race = { answer, results, answerCountry, runners: [], token, start: 0, firstShown: false };
+              finishRace();
+            }, 700);
+          } else {
+            setTimeout(() => startRace(answer, results, answerCountry, token), 500);
+          }
         });
       });
     }
@@ -2501,12 +2519,26 @@
       if (state.mode === 'country') {
         const correct = all.filter((r) => r.tier === 'correct').map((r) => r.p.name);
         const closest = all.filter((r) => r.closest).map((r) => r.p.name);
+        const PRAISE = ['대단하개! 🎉', '천재 강아지 아니개?! 🌏', '킁킁, 냄새만으로 맞혔개! 👏', '세계여행 고수개! ✈️', '꼬리가 저절로 흔들리개! 🐾'];
+        const praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
         let sub;
-        if (correct.length) sub = multi ? `🎉 ${correct.join(' · ')} 정답!` : '🎉 정답!';
+        if (correct.length) sub = multi ? `${correct.join(' · ')} 정답! ${praise}` : `정답! ${praise}`;
         else if (closest.length) sub = multi ? `정답자 없음 · 🎯 ${closest.join(' · ')} 가장 가까웠어요` : '아쉬워요! 그래도 가장 가까웠어요 🎯';
         else sub = '아무도 못 골랐어요 😅';
         el.resultTitle.innerHTML = `정답은 ${esc(race.answerCountry.name)}!<span class="title-sub">${esc(sub)}</span>`;
         if (!correct.length) Sound.sad();
+        else Sound.fanfare(false);
+        // 점수 받은 강아지는 자리에서 짖고 점수 배지 달기
+        all.forEach((r, i) => {
+          if (!r.runner) return;
+          const badge = r.runner.dogEl.querySelector('.dog-badge');
+          if (r.points > 0) {
+            badge.textContent = `+${r.points}`;
+            badge.classList.remove('hide');
+            r.runner.marker.setZIndex(100 + r.points);
+            setTimeout(() => { Sound.bark(r.p.dog); showBark(r.runner.dogEl, r.p.dog); }, 250 + i * 180);
+          }
+        });
         const sorted = all.slice().sort((a, b) => (b.points - a.points) || ((a.place || 99) - (b.place || 99)));
         el.rankList.innerHTML = sorted.map((r) => rankItemHtml(r, true)).join('');
       } else {
@@ -2533,6 +2565,7 @@
 
       race = null;
       el.nextBtn.textContent = state.round >= state.rounds ? '누가 1등이개? 🏆' : '산책갈까?';
+      el.nextBtn.disabled = false;
       el.nextBtn.focus();
     }
 
@@ -2547,8 +2580,6 @@
         const sub = [];
         if (r.country) sub.push(esc(r.country.name));
         if (r.closest && r.tier !== 'wrong') sub.push('가장 가까움');
-        if (r.place) sub.push(`${r.place}등 도착`);
-        if (km) sub.push(km);
         return `
           <li class="rank-item${done && r.win ? ' win' : ''}">
             ${avatar}
@@ -2582,7 +2613,7 @@
     function showFinal() {
       const multi = state.players.length > 1;
       const ranked = state.players.slice().sort((a, b) =>
-        b.wins - a.wins || a.misses - b.misses || a.total - b.total);
+        b.wins - a.wins || (state.mode === 'country' ? b.correct - a.correct : 0) || a.misses - b.misses || a.total - b.total);
       const top = ranked[0];
       const isCountry = state.mode === 'country';
       const unit = isCountry ? '점' : '승';
@@ -2592,7 +2623,9 @@
         el.finalTitle.textContent = `${top.name} 우승!`;
         if (isCountry) {
           el.finalSub.textContent = tied.length > 1
-              ? `${top.wins}점 동률이라 총 거리가 더 짧은 강아지가 이겼어요`
+              ? (tied.some((p) => p !== top && p.correct < top.correct)
+                  ? `${top.wins}점 동률! 정답을 더 많이 맞힌 강아지가 이겼어요`
+                  : `${top.wins}점 동률! 아슬아슬하게 이겼개`)
               : `${state.rounds}문제에서 ${top.wins}점 (정답 ${top.correct}개)`;
         } else {
           el.finalSub.textContent = tied.length > 1
@@ -2602,7 +2635,7 @@
       } else if (isCountry) {
         el.finalTitle.textContent = `${top.wins}점 / 만점 ${state.rounds * COUNTRY_POINTS.correct}점`;
         el.finalSub.textContent = top.correct === state.rounds
-            ? '전부 맞혔어요! 세계여행 고수 🌏'
+            ? '전부 맞혔개! 진짜 대단하개! 세계여행 고수 🌏'
             : `${state.rounds}문제 중 ${top.correct}개 나라를 정확히 맞혔어요`;
       } else {
         el.finalTitle.textContent = `${state.rounds}라운드 완주! 🐾`;
@@ -2615,7 +2648,7 @@
         const meta = [];
         if (isCountry) meta.push(`정답 ${p.correct}개`);
         else if (multi) meta.push(`1등 도착 ${p.wins}번`);
-        meta.push(`총 거리 ${fmtDist(p.total)}`);
+        if (!isCountry) meta.push(`총 거리 ${fmtDist(p.total)}`);
         if (p.misses) meta.push(`시간 초과 ${p.misses}회`);
         return `
           <li class="final-item">
